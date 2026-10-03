@@ -9,6 +9,8 @@ bciciv2a_*_test_*.csv
 bciciv2a_*_validation_*.csv
 bciciv2a_*_replay_*.csv
 bciciv2a_*_policy_*.json
+fetch_reach_sac.zip
+fetch_reach_rl_report.json
 
 # Python 与本地环境
 .venv/
