@@ -1,0 +1,21 @@
+# 本机数据、模型和逐试次记录
+data/
+*.gdf
+*.edf
+*.mat
+*.joblib
+*.pt
+bciciv2a_*_test_*.csv
+bciciv2a_*_validation_*.csv
+bciciv2a_*_replay_*.csv
+bciciv2a_*_policy_*.json
+
+# Python 与本地环境
+.venv/
+.eeg_venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
