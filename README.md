@@ -80,8 +80,33 @@ py -3.12 -m venv .venv
 | `calibrate_bciciv2a_A07_abstain.py` | 仅用 A07T 验证轮次选择不动作阈值 |
 | `replay_bciciv2a_four_commands_fetch.py` | 将离线预测按状态映射到 Fetch 仿真并生成回放日志 |
 | `requirements-eeg.txt`、`requirements-fetch.txt` | 本次 Windows 环境所用依赖版本 |
+| `train_fetch_reach_rl.py` | 使用 SAC 训练、评估并可视化 FetchReach 策略 |
 
 模型、预测 CSV、策略 JSON、原始数据和虚拟环境均由程序在本机生成或由用户自行下载，并已加入 `.gitignore`。仓库不提供已训练模型；请按上述步骤复现。
+
+## 强化学习入门：FetchReach + SAC
+
+仓库另含一个独立的强化学习练习：使用 Stable-Baselines3 的 **SAC（Soft Actor-Critic）**，在 `FetchReachDense-v4` 中训练机械臂末端到达目标点。策略读取仿真提供的状态和目标位置，使用两层、每层 128 个单元的 MLP；奖励会根据末端与目标的距离变化。此练习训练的是机器人动作策略，不是 EEG 分类器，也不执行抓取或放置。
+
+一次 20,000 步的本地运行记录为：训练前随机动作在 20 个回合中成功 8 次，训练后策略成功 20 次，成功回合平均 2.2 步。20 回合属于初步检查。要看新随机场景上的表现，可用保存的模型再跑 100 回合，并与随机动作在相同场景上比较。
+
+```powershell
+# 在仓库根目录安装 Fetch 仿真与强化学习依赖
+& '.\.venv\Scripts\python.exe' -m pip install -r requirements-fetch.txt
+
+# 从头训练 20,000 步；将模型和逐回合报告保存在仓库目录
+& '.\.venv\Scripts\python.exe' '.\train_fetch_reach_rl.py' train --steps 20000
+
+# 在 100 个新随机场景中比较随机策略和已保存模型
+& '.\.venv\Scripts\python.exe' '.\train_fetch_reach_rl.py' eval --episodes 100
+
+# 打开仿真窗口观看训练策略
+& '.\.venv\Scripts\python.exe' '.\train_fetch_reach_rl.py' watch --episodes 5
+```
+
+`eval` 默认从独立于训练时评估的随机种子开始；观察成功率、成功回合步数和最终距离。只有在新场景上持续达到预设成功率，才说明策略对这些随机场景表现稳定。模型文件 `fetch_reach_sac.zip` 和报告 `fetch_reach_rl_report.json` 是本地产物，不提交到仓库。当前脚本默认用 CPU；可通过 `--device cuda` 指定 CUDA。
+
+该实验只验证目标点到达。它没有训练抓取放置，也没有把 EEG 输出接入策略，因此不能据此声称 EEG 已控制机械臂。
 
 ## 局限
 
